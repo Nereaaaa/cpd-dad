@@ -1,7 +1,12 @@
 package es.codeurjc.api.Controller;
 
+import es.codeurjc.api.Config.RabbitConfig;
+import es.codeurjc.api.DTO.CreateInstanceRequest;
+import es.codeurjc.api.Messaging.MessageSender;
 import es.codeurjc.api.Model.Disk;
+import es.codeurjc.api.Model.DiskStatus;
 import es.codeurjc.api.Model.Instance;
+import es.codeurjc.api.Model.InstanceStatus;
 import es.codeurjc.api.Service.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +27,8 @@ public class InstanceController {
 	
 	@Autowired
     private DiskService diskService;
+	@Autowired
+ 	private MessageSender messageSender;
 
 
 	@GetMapping
@@ -37,24 +44,30 @@ public class InstanceController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createInstance(@RequestBody Instance instance) {
-        instance.setId(UUID.randomUUID());
+    public ResponseEntity<?> createInstance(@RequestBody CreateInstanceRequest request) {
+        
+        Disk newDisk = new Disk();
+        newDisk.setId(UUID.randomUUID());
+        newDisk.setSize(request.getDiskSize());
+        newDisk.setType(request.getDiskType());
+        newDisk.setStatus(DiskStatus.REQUESTED);
+        Disk savedDisk = diskService.save(newDisk);
 
-        // Validar que el disco exista y esté en estado ASSIGNED (opcional, según negocio)
-        Disk incomingDisk = instance.getDisk();
-        if (incomingDisk == null || incomingDisk.getId() == null) {
-            return ResponseEntity.badRequest().body("Disk ID is required.");
-        }
+        
+        Instance newInstance = new Instance();
+        newInstance.setId(UUID.randomUUID());
+        newInstance.setName(request.getName());
+        newInstance.setMemory(request.getMemory());
+        newInstance.setCores(request.getCores());
+        newInstance.setStatus(InstanceStatus.BUILDING_DISK);
+        newInstance.setDisk(savedDisk);
 
-        Optional<Disk> diskOpt = diskService.findById(incomingDisk.getId());
-        if (diskOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Disk not found.");
-        }
+        Instance savedInstance = instanceService.save(newInstance);
+        
+        messageSender.send(RabbitConfig.DISK_REQUESTS, savedDisk);
 
-        instance.setDisk(diskOpt.get());
-
-        Instance saved = instanceService.save(instance);
-        return ResponseEntity.created(URI.create("/api/instances/" + saved.getId())).body(saved);
+        return ResponseEntity.created(URI.create("/api/instances/" + savedInstance.getId()))
+                .body(savedInstance);
     }
 
     @DeleteMapping("/{id}")
