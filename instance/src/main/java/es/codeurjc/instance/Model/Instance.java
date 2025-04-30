@@ -1,0 +1,34 @@
+package es.codeurjc.instance.Model;
+ 
+ import com.fasterxml.jackson.annotation.JsonInclude;
+ import java.util.UUID;
+ 
+ @JsonInclude(JsonInclude.Include.NON_NULL)
+ public class Instance {
+ 
+     private UUID id;
+     private String name;
+     private int memory;
+     private int cores;
+     private String ip;
+     private InstanceStatus status;
+ 
+     // Getters and Setters
+     public UUID getId() { return id; }
+     public void setId(UUID id) { this.id = id; }
+ 
+     public String getName() { return name; }
+     public void setName(String name) { this.name = name; }
+ 
+     public int getMemory() { return memory; }
+     public void setMemory(int memory) { this.memory = memory; }
+ 
+     public int getCores() { return cores; }
+     public void setCores(int cores) { this.cores = cores; }
+ 
+     public String getIp() { return ip; }
+     public void setIp(String ip) { this.ip = ip; }
+ 
+     public InstanceStatus getStatus() { return status; }
+     public void setStatus(InstanceStatus status) { this.status = status; }
+ }
