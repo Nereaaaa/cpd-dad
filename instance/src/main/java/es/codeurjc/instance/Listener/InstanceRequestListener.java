@@ -10,7 +10,9 @@ package es.codeurjc.instance.Listener;
  
  import java.util.UUID;
  import java.util.concurrent.*;
- 
+ import org.springframework.amqp.core.Message;
+ import java.nio.charset.StandardCharsets;
+
  @Component
  public class InstanceRequestListener {
  
@@ -22,9 +24,10 @@ package es.codeurjc.instance.Listener;
      }
  
      @RabbitListener(queues = RabbitConfig.INSTANCE_REQUESTS)
-     public void handleInstanceRequest(String message) {
+     public void handleInstanceRequest(Message message) {
          try {
-             Instance instance = objectMapper.readValue(message, Instance.class);
+         	String json = new String(message.getBody(), StandardCharsets.UTF_8);
+             Instance instance = objectMapper.readValue(json, Instance.class);
              UUID id = instance.getId();
  
              //System.out.println("[INSTANCE] Recibida petición para crear instancia: " + id);

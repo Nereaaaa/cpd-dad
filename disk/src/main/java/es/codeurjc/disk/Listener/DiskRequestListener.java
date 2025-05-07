@@ -11,7 +11,9 @@ package es.codeurjc.disk.Listener;
  
  import java.util.UUID;
  import java.util.concurrent.*;
- 
+ import org.springframework.amqp.core.Message;
+ import java.nio.charset.StandardCharsets;
+
  @Component
  public class DiskRequestListener {
  	@Autowired
@@ -20,12 +22,12 @@ package es.codeurjc.disk.Listener;
  
  
      @RabbitListener(queues = RabbitConfig.DISK_REQUESTS)
-     public void handleDiskRequest(String message) {
+     public void handleDiskRequest(Message message) {
          try {
-             Disk disk = objectMapper.readValue(message, Disk.class);
-             UUID diskId = disk.getId();
+         	String json = new String(message.getBody(), StandardCharsets.UTF_8);
+             Disk disk = objectMapper.readValue(json, Disk.class);
  
-             //System.out.println("[DISK] Petición recibida para crear disco: " + diskId);
+             System.out.println("[DISK] Petición recibida para crear disco: " + disk);
  
              // Estado REQUESTED
              disk.setStatus(DiskStatus.REQUESTED);
@@ -50,7 +52,7 @@ package es.codeurjc.disk.Listener;
              try {
                  String updated = objectMapper.writeValueAsString(disk);
                  rabbitTemplate.convertAndSend(RabbitConfig.DISK_STATUSES, updated);
-                 //System.out.println("[DISK] Estado enviado: " + disk.getId() + " -> " + disk.getStatus());
+                 System.out.println("[DISK] Estado enviado: " + disk.getId() + " -> " + disk.getStatus());
              } catch (Exception e) {
                  e.printStackTrace();
              }

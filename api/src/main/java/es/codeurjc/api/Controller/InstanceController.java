@@ -64,6 +64,8 @@ public class InstanceController {
 
         Instance savedInstance = instanceService.save(newInstance);
         
+        System.out.println("[API] Petición enviada para crear disco: " + savedDisk);
+        
         messageSender.send(RabbitConfig.DISK_REQUESTS, savedDisk);
 
         return ResponseEntity.created(URI.create("/api/instances/" + savedInstance.getId()))
