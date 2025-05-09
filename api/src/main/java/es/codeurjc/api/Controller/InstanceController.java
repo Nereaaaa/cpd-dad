@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class InstanceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Instance> getInstanceById(@PathVariable UUID id) {
+    public ResponseEntity<Instance> getInstanceById(@PathVariable Long id) {
         return instanceService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -47,7 +48,6 @@ public class InstanceController {
     public ResponseEntity<?> createInstance(@RequestBody CreateInstanceRequest request) {
         
         Disk newDisk = new Disk();
-        newDisk.setId(UUID.randomUUID());
         newDisk.setSize(request.getDiskSize());
         newDisk.setType(request.getDiskType());
         newDisk.setStatus(DiskStatus.REQUESTED);
@@ -55,7 +55,6 @@ public class InstanceController {
 
         
         Instance newInstance = new Instance();
-        newInstance.setId(UUID.randomUUID());
         newInstance.setName(request.getName());
         newInstance.setMemory(request.getMemory());
         newInstance.setCores(request.getCores());
@@ -66,14 +65,20 @@ public class InstanceController {
         
         System.out.println("[API] Petición enviada para crear disco: " + savedDisk);
         
-        messageSender.send(RabbitConfig.DISK_REQUESTS, savedDisk);
-
+        Map<String, Object> payload = Map.of(
+                "id", newDisk.getId(),
+                "size", newDisk.getSize(),
+                "type", newDisk.getType().toString(),
+                "status", newDisk.getStatus().toString()
+            );
+        messageSender.send(RabbitConfig.DISK_REQUESTS, payload);
+        
         return ResponseEntity.created(URI.create("/api/instances/" + savedInstance.getId()))
                 .body(savedInstance);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInstance(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteInstance(@PathVariable Long id) {
         instanceService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -27,7 +27,7 @@ public class DiskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Disk> getDiskById(@PathVariable UUID id) {
+    public ResponseEntity<Disk> getDiskById(@PathVariable Long id) {
         return diskService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -35,13 +35,12 @@ public class DiskController {
 
     @PostMapping
     public ResponseEntity<Disk> createDisk(@RequestBody Disk disk) {
-        disk.setId(UUID.randomUUID());
         Disk saved = diskService.save(disk);
         return ResponseEntity.created(URI.create("/api/disks/" + saved.getId())).body(saved);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDisk(@PathVariable UUID id) {
+    public ResponseEntity<?> deleteDisk(@PathVariable Long id) {
         Optional<Disk> diskOpt = diskService.findById(id);
         if (diskOpt.isEmpty()) {
             return ResponseEntity.notFound().build();

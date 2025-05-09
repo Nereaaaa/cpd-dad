@@ -21,7 +21,7 @@ public class DiskService {
         return diskRepository.findAll();
     }
 
-    public Optional<Disk> findById(UUID id) {
+    public Optional<Disk> findById(Long id) {
         return diskRepository.findById(id);
     }
 
@@ -29,7 +29,7 @@ public class DiskService {
         return diskRepository.save(disk);
     }
 
-    public void delete(UUID id) {
+    public void delete(Long id) {
         diskRepository.deleteById(id);
     }
 }

@@ -7,7 +7,8 @@ import java.util.UUID;
 public class Instance {
 
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     private String name;
     
@@ -24,11 +25,11 @@ public class Instance {
     private Disk disk; //PONER QUE ES DISKTYPE Y DISKSIZE ??
     
     // Getters and Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

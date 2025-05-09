@@ -7,7 +7,8 @@ import java.util.UUID;
 public class Disk {
 
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     private int size;
 
@@ -18,11 +19,11 @@ public class Disk {
     private DiskStatus status;
 
     // Getters and setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

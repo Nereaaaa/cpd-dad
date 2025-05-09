@@ -21,7 +21,7 @@ public class InstanceService {
         return instanceRepository.findAll();
     }
 
-    public Optional<Instance> findById(UUID id) {
+    public Optional<Instance> findById(Long id) {
         return instanceRepository.findById(id);
     }
 
@@ -29,7 +29,7 @@ public class InstanceService {
         return instanceRepository.save(instance);
     }
 
-    public void delete(UUID id) {
+    public void delete(Long id) {
         instanceRepository.deleteById(id);
     }
 }

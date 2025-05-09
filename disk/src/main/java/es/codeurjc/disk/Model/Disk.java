@@ -6,14 +6,14 @@ package es.codeurjc.disk.Model;
  @JsonInclude(JsonInclude.Include.NON_NULL)
  public class Disk {
  
-     private UUID id;
+     private Long id;
      private int size;
      private DiskType type;
      private DiskStatus status;
  
      // Getters y setters
-     public UUID getId() { return id; }
-     public void setId(UUID id) { this.id = id; }
+     public Long getId() { return id; }
+     public void setId(Long id) { this.id = id; }
  
      public int getSize() { return size; }
      public void setSize(int size) { this.size = size; }
