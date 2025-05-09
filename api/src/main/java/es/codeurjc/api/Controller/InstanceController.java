@@ -63,13 +63,13 @@ public class InstanceController {
 
         Instance savedInstance = instanceService.save(newInstance);
         
-        System.out.println("[API] Petición enviada para crear disco: " + savedDisk);
+        System.out.println("[API] Petición enviada para crear disco: " + savedDisk.getId() + " "+ savedDisk.getStatus()+ "\n");
         
         Map<String, Object> payload = Map.of(
-                "id", newDisk.getId(),
-                "size", newDisk.getSize(),
-                "type", newDisk.getType().toString(),
-                "status", newDisk.getStatus().toString()
+                "id", savedDisk.getId(),
+                "size", savedDisk.getSize(),
+                "type", savedDisk.getType().toString(),
+                "status", savedDisk.getStatus().toString()
             );
         messageSender.send(RabbitConfig.DISK_REQUESTS, payload);
         
