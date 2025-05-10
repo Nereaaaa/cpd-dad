@@ -57,7 +57,8 @@ package es.codeurjc.instance.Listener;
                      instance.setStatus(InstanceStatus.RUNNING);
                      Map<String, Object> payload = Map.of(
                              "id", instance.getId(),
-                             "status",instance.getStatus()
+                             "status",instance.getStatus(),
+                             "ip",instance.getIp()
                          );
                      rabbitTemplate.convertAndSend(RabbitConfig.INSTANCE_STATUSES, payload);
                      System.out.println("[INSTANCE] Instancia lista: " + id + " con IP " + instance.getIp());
