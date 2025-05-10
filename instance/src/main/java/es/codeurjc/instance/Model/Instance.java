@@ -6,7 +6,7 @@ package es.codeurjc.instance.Model;
  @JsonInclude(JsonInclude.Include.NON_NULL)
  public class Instance {
  
-     private UUID id;
+	 private Long id;
      private String name;
      private int memory;
      private int cores;
@@ -14,8 +14,8 @@ package es.codeurjc.instance.Model;
      private InstanceStatus status;
  
      // Getters and Setters
-     public UUID getId() { return id; }
-     public void setId(UUID id) { this.id = id; }
+     public Long getId() { return id; }
+     public void setId(Long id) { this.id = id; }
  
      public String getName() { return name; }
      public void setName(String name) { this.name = name; }

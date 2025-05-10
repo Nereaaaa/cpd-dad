@@ -22,7 +22,7 @@ public class Instance {
 
     @OneToOne
     @JoinColumn(name = "disk_id", unique = true) 
-    private Disk disk; //PONER QUE ES DISKTYPE Y DISKSIZE ??
+    private Disk disk; 
     
     // Getters and Setters
     public Long getId() {

@@ -1,10 +1,10 @@
 package es.codeurjc.api.Repository;
 
-import es.codeurjc.api.Model.Instance;
+import es.codeurjc.api.Model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.Optional;
 import java.util.UUID;
 
 public interface InstanceRepository extends JpaRepository<Instance, Long> {
-    // Métodos personalizados si quieres buscar por estado, nombre, etc.
+	Optional<Instance> findByDisk(Disk disk);
 }

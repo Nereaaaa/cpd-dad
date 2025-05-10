@@ -7,16 +7,18 @@ package es.codeurjc.instance.Listener;
  import org.springframework.amqp.rabbit.annotation.RabbitListener;
  import org.springframework.amqp.rabbit.core.RabbitTemplate;
  import org.springframework.stereotype.Component;
- 
+ import org.springframework.beans.factory.annotation.Autowired;
  import java.util.UUID;
  import java.util.concurrent.*;
  import org.springframework.amqp.core.Message;
  import java.nio.charset.StandardCharsets;
+ import java.util.Map;
 
  @Component
  public class InstanceRequestListener {
  
-     private final RabbitTemplate rabbitTemplate;
+	 @Autowired
+	 private  RabbitTemplate rabbitTemplate;
      private final ObjectMapper objectMapper = new ObjectMapper();
  
      public InstanceRequestListener(RabbitTemplate rabbitTemplate) {
@@ -24,14 +26,24 @@ package es.codeurjc.instance.Listener;
      }
  
      @RabbitListener(queues = RabbitConfig.INSTANCE_REQUESTS)
-     public void handleInstanceRequest(Message message) {
+     public void handleInstanceRequest(Map<String, Object> message) {
          try {
-         	String json = new String(message.getBody(), StandardCharsets.UTF_8);
-             Instance instance = objectMapper.readValue(json, Instance.class);
-             UUID id = instance.getId();
- 
-             //System.out.println("[INSTANCE] Recibida petición para crear instancia: " + id);
- 
+        	 Object idObj = message.get("id");
+         	Long id = (idObj instanceof Number) ? ((Number) idObj).longValue() : null;
+         	
+         	String name = (String) message.get("name");
+             int memory = (int) message.get("memory");
+             int cores = (int) message.get("cores");
+             
+             
+             Instance instance = new Instance();
+             instance.setId(id);
+             instance.setName(name);
+             instance.setMemory(memory);
+             instance.setCores(cores);
+             instance.setStatus(InstanceStatus.BUILDING_DISK);
+             System.out.println("[INSTANCE] Recibida petición para crear instancia: "+ id + ": " + instance.getStatus());
+
              sendStatus(instance, InstanceStatus.BUILDING_DISK, 0);
              sendStatus(instance, InstanceStatus.STARTING, 5);
              sendStatus(instance, InstanceStatus.INITIALIZING, 10);
@@ -43,8 +55,11 @@ package es.codeurjc.instance.Listener;
                  try {
                      instance.setIp("192.168.1." + (int) (Math.random() * 253 + 2));
                      instance.setStatus(InstanceStatus.RUNNING);
-                     String msg = objectMapper.writeValueAsString(instance);
-                     rabbitTemplate.convertAndSend(RabbitConfig.INSTANCE_STATUSES, msg);
+                     Map<String, Object> payload = Map.of(
+                             "id", instance.getId(),
+                             "status",instance.getStatus()
+                         );
+                     rabbitTemplate.convertAndSend(RabbitConfig.INSTANCE_STATUSES, payload);
                      System.out.println("[INSTANCE] Instancia lista: " + id + " con IP " + instance.getIp());
                  } catch (Exception e) {
                      e.printStackTrace();
@@ -61,8 +76,22 @@ package es.codeurjc.instance.Listener;
          executor.schedule(() -> {
              try {
                  instance.setStatus(status);
-                 String json = objectMapper.writeValueAsString(instance);
-                 rabbitTemplate.convertAndSend(RabbitConfig.INSTANCE_STATUSES, json);
+                 Map<String, Object> payload;
+                 if (instance.getIp() != null) {
+                     // Solo cuando la IP ya existe
+                     payload = Map.of(
+                             "id", instance.getId(),
+                             "status", instance.getStatus(),
+                             "ip", instance.getIp()
+                     );
+                 } else {
+                     // No incluir IP si aún no existe
+                     payload = Map.of(
+                             "id", instance.getId(),
+                             "status", instance.getStatus()
+                     );
+                 }
+                 rabbitTemplate.convertAndSend(RabbitConfig.INSTANCE_STATUSES, payload);
                  System.out.println("[INSTANCE] Estado: " + instance.getId() + " -> " + status);
              } catch (Exception e) {
                  e.printStackTrace();
