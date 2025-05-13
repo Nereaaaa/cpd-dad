@@ -2,6 +2,8 @@ package es.codeurjc.api.Service;
 
 import es.codeurjc.api.Model.Disk;
 import es.codeurjc.api.Repository.DiskRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,12 +13,9 @@ import java.util.UUID;
 @Service
 public class DiskService {
 
-    private final DiskRepository diskRepository;
-
-    public DiskService(DiskRepository diskRepository) {
-        this.diskRepository = diskRepository;
-    }
-
+	@Autowired
+    private DiskRepository diskRepository;
+	
     public List<Disk> findAll() {
         return diskRepository.findAll();
     }

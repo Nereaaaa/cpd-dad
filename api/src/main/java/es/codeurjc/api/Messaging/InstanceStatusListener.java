@@ -2,7 +2,9 @@ package es.codeurjc.api.Messaging;
  
 import es.codeurjc.api.Model.*;
  import es.codeurjc.api.Repository.InstanceRepository;
- import com.fasterxml.jackson.databind.ObjectMapper;
+import es.codeurjc.api.Service.InstanceService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
  import org.springframework.amqp.rabbit.annotation.RabbitListener;
  import org.springframework.stereotype.Component;
  import org.springframework.amqp.core.Message;
@@ -14,9 +16,8 @@ import es.codeurjc.api.Model.*;
  @Component
  public class InstanceStatusListener {
  
-     private final ObjectMapper objectMapper = new ObjectMapper();
-     @Autowired
-     private InstanceRepository instanceRepository;
+	 @Autowired
+	    private InstanceService instanceService;
      
      @RabbitListener(queues = "instance-statuses")
      public void handleInstanceStatus(Map<String, Object> message) {
@@ -28,8 +29,8 @@ import es.codeurjc.api.Model.*;
              
              String ip = (String) message.get("ip"); 
 
-             System.out.println("[API] Estado recibido para instancia " + id + ": " + status);
-             Optional<Instance> instanceOpt = instanceRepository.findById(id);
+             System.out.println("[API] Received status for instance " + id + ": " + status);
+             Optional<Instance> instanceOpt = instanceService.findById(id);
              if (instanceOpt.isPresent()) {
                  Instance instance = instanceOpt.get();
                  instance.setStatus(status);
@@ -38,10 +39,10 @@ import es.codeurjc.api.Model.*;
                      instance.setIp(ip);
                  }
 
-                 instanceRepository.save(instance); // Guardar cambios
-                 System.out.println("[API] Instancia actualizada: " + instance.getId() + " estado: " + instance.getStatus());
+                 instanceService.save(instance); 
+                 System.out.println("[API] Updated instance: " + instance.getId() + " status: " + instance.getStatus());
              } else {
-                 System.err.println("[API] No se encontró instancia con ID: " + id);
+                 System.err.println("[API] No instance found with ID: " + id);
              }
          } catch (Exception e) {
              e.printStackTrace();

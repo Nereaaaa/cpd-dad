@@ -19,11 +19,7 @@ package es.codeurjc.instance.Listener;
  
 	 @Autowired
 	 private  RabbitTemplate rabbitTemplate;
-     private final ObjectMapper objectMapper = new ObjectMapper();
- 
-     public InstanceRequestListener(RabbitTemplate rabbitTemplate) {
-         this.rabbitTemplate = rabbitTemplate;
-     }
+     
  
      @RabbitListener(queues = RabbitConfig.INSTANCE_REQUESTS)
      public void handleInstanceRequest(Map<String, Object> message) {
@@ -42,14 +38,13 @@ package es.codeurjc.instance.Listener;
              instance.setMemory(memory);
              instance.setCores(cores);
              instance.setStatus(InstanceStatus.BUILDING_DISK);
-             System.out.println("[INSTANCE] Recibida petición para crear instancia: "+ id + ": " + instance.getStatus());
+             System.out.println("[INSTANCE] Received request to create instance: "+ id + ": " + instance.getStatus());
 
              sendStatus(instance, InstanceStatus.BUILDING_DISK, 0);
              sendStatus(instance, InstanceStatus.STARTING, 5);
              sendStatus(instance, InstanceStatus.INITIALIZING, 10);
              sendStatus(instance, InstanceStatus.ASSIGNING_IP, 15);
  
-             // Asignar IP aleatoria justo antes de "RUNNING"
              ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
              executor.schedule(() -> {
                  try {
@@ -61,7 +56,7 @@ package es.codeurjc.instance.Listener;
                              "ip",instance.getIp()
                          );
                      rabbitTemplate.convertAndSend(RabbitConfig.INSTANCE_STATUSES, payload);
-                     System.out.println("[INSTANCE] Instancia lista: " + id + " con IP " + instance.getIp());
+                     System.out.println("[INSTANCE] Instance ready: " + id + " with IP " + instance.getIp());
                  } catch (Exception e) {
                      e.printStackTrace();
                  }
@@ -79,14 +74,12 @@ package es.codeurjc.instance.Listener;
                  instance.setStatus(status);
                  Map<String, Object> payload;
                  if (instance.getIp() != null) {
-                     // Solo cuando la IP ya existe
                      payload = Map.of(
                              "id", instance.getId(),
                              "status", instance.getStatus(),
                              "ip", instance.getIp()
                      );
                  } else {
-                     // No incluir IP si aún no existe
                      payload = Map.of(
                              "id", instance.getId(),
                              "status", instance.getStatus()

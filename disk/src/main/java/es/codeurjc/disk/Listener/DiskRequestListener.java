@@ -17,8 +17,8 @@ import java.util.UUID;
  @Component
  public class DiskRequestListener {
  	@Autowired
-     private  RabbitTemplate rabbitTemplate;
-     private final ObjectMapper objectMapper = new ObjectMapper();
+    private  RabbitTemplate rabbitTemplate;
+    
  
  
      @RabbitListener(queues = RabbitConfig.DISK_REQUESTS)

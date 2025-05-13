@@ -2,7 +2,7 @@ package es.codeurjc.api.Messaging;
  
 import es.codeurjc.api.Model.*;
 import es.codeurjc.api.Repository.*;
-import es.codeurjc.api.Service.DiskService;
+import es.codeurjc.api.Service.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
  import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -17,11 +17,8 @@ import es.codeurjc.api.Config.RabbitConfig;
  @Component
  public class DiskStatusListener {
  
-     private final ObjectMapper objectMapper = new ObjectMapper();
-     @Autowired
-     private DiskRepository diskRepository;
-     @Autowired
-     private InstanceRepository instanceRepository;
+	 @Autowired
+	 private InstanceService instanceService;
      @Autowired
      private DiskService diskService;
      @Autowired
@@ -38,16 +35,16 @@ import es.codeurjc.api.Config.RabbitConfig;
              DiskType type = DiskType.valueOf(message.get("type").toString());
              DiskStatus status = DiskStatus.valueOf(message.get("status").toString());
              
-             System.out.println("[API] Estado recibido: " + id + " -> " + status+" -> " + type+" -> " + size);
+             System.out.println("[API] Received status: " + id + " -> " + status+" -> " + type+" -> " + size);
              
-             Optional<Disk> diskOpt = diskRepository.findById(id);
+             Optional<Disk> diskOpt = diskService.findById(id);
              if (diskOpt.isPresent()) {
                  Disk disk = diskOpt.get();
                  
                  disk.setStatus(status);       
-                 diskRepository.save(disk);          
+                 diskService.save(disk);          
                  if (status == DiskStatus.ASSIGNED) {
-                 	Optional<Instance> instanceOpt = instanceRepository.findByDisk(disk);
+                 	Optional<Instance> instanceOpt = instanceService.findByDisk(disk);
                      if (instanceOpt.isPresent()) {
                          Instance instance = instanceOpt.get();
 
@@ -61,9 +58,9 @@ import es.codeurjc.api.Config.RabbitConfig;
 
                          messageSender.send(RabbitConfig.INSTANCE_REQUESTS, payload);
 
-                         System.out.println("[API] Petición enviada a instance-requests para la instancia: " + instance.getId());
+                         System.out.println("[API] Petition send to create an Instance: " + instance.getId());
                      } else {
-                         System.out.println("[API] No se encontró instancia asociada al disco: " + disk.getId());
+                         System.out.println("[API] No instance associated with the disk was found:  " + disk.getId());
                      }
                  }      
              } else {
