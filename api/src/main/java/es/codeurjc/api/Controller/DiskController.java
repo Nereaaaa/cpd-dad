@@ -33,11 +33,11 @@ public class DiskController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    /**@PostMapping
     public ResponseEntity<Disk> createDisk(@RequestBody Disk disk) {
         Disk saved = diskService.save(disk);
         return ResponseEntity.created(URI.create("/api/disks/" + saved.getId())).body(saved);
-    }
+    }**/
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDisk(@PathVariable Long id) {

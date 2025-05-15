@@ -79,6 +79,20 @@ public class InstanceController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInstance(@PathVariable Long id) {
+        Optional<Instance> instanceOpt = instanceService.findById(id);
+
+        if (instanceOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Instance instance = instanceOpt.get();
+        Disk disk = instance.getDisk();
+
+        // Change disk status
+        disk.setStatus(DiskStatus.UNASSIGNED);
+        diskService.save(disk);
+
+        // Delete instance
         instanceService.delete(id);
         return ResponseEntity.noContent().build();
     }
