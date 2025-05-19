@@ -23,7 +23,7 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
   api:
-    build: ./api
+    image: nnrea/api
     container_name: api
     ports:
       - "8080:8080"
@@ -37,7 +37,7 @@ services:
       - rabbitmq
 
   disk:
-    build: ./disk
+    image: nnrea/disk
     container_name: disk
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
@@ -45,7 +45,7 @@ services:
       - rabbitmq
 
   instance:
-    build: ./instance
+    image: nnrea/instance
     container_name: instance
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
