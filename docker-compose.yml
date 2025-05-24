@@ -22,19 +22,44 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
-  api:
+  api1:
     image: nnrea/api
-    container_name: api
-    ports:
-      - "8080:8080"
+    container_name: api1
+
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cpd_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_RABBITMQ_HOST: rabbitmq
+      SERVER_PORT: 8080
+
     depends_on:
       - mysql
       - rabbitmq
+
+ api2:
+    image: nnrea/apiprueba
+    container_name: api2
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cpd_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SERVER_PORT: 8080
+    depends_on:
+      - mysql
+      - rabbitmq
+
+  haproxy:
+    image: haproxy:2.7
+    container_name: haproxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - api1
+      - api2
 
   disk:
     image: nnrea/disk
