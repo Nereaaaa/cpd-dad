@@ -80,32 +80,31 @@ Tasks:
 
 ### Tasks performed
   
-- 1
-- 2 
-- 3
-- 4  
-- 5
+- Developed the instance-service and disk-service microservices and integrated both with RabbitMQ.
+- Implemented the hierarchical logic for instances and disks, enabling structured resource representation.
+- Configured and wrote the docker-compose.yml to orchestrate MySQL, RabbitMQ, API, Disk, and Instance services.
+- Integrated Jackson JSON conversion for message handling in RabbitMQ.
+- Enhanced API behavior by using environment variables, fixing REST operations, and improving resource deletion logic.
 
 ---
 
 ### Top 5 commits
 
-1. []()
-2. []()
-3. []()
-4. []()
-5. []()
-
+1. [`Disk hierarchy implemented (not tested) (With RabbitMQ)`](https://github.com/Nereaaaa/cpd-dad/commit/2ba5a526e307d0c5a4dd8dd127db88d5b07d743a)
+2. [`Instance hierarchy implemented (not tested) (With RabbitMQ)`](https://github.com/Nereaaaa/cpd-dad/commit/fc5a7d0dd1218dd68bfb875a29faa99d68996bfd)
+3. [`Created docker-compose.yml`](https://github.com/Nereaaaa/cpd-dad/commit/2b8ace576ce80bf71f54b0d10273fd45ee5d1e98)
+4. [`Jackson2Json message conversion initiated`](https://github.com/Nereaaaa/cpd-dad/commit/64a3a1ae0da85f2b9c07c334f4d0363bc991fc3c)
+5. [`Use env vars, fix REST API, disable disk creation, fix instance delet`](https://github.com/your-user/cpd-dad/commit/ad76db55c2111568120a2dbb339c3ab788146aec)
 
 ---
 
 ### Top 5 files edited
 
-1. []()
-2. []()
-3. []()
-4. []()
-5. []()
+1. [`InstanceRequestListener.java`](https://github.com/Nereaaaa/cpd-dad/blob/main/instance/src/main/java/es/codeurjc/instance/Listener/InstanceRequestListener.java)
+2. [`Instance.java`]((https://github.com/Nereaaaa/cpd-dad/blob/main/instance/src/main/java/es/codeurjc/instance/Model/Instance.java)
+3. [`docker-compose.yml`]((https://github.com/Nereaaaa/cpd-dad/blob/main/docker-compose.yml)
+4. [`Disk.java`]((https://github.com/Nereaaaa/cpd-dad/blob/main/disk/src/main/java/es/codeurjc/disk/Model/Disk.java)
+5. [`DiskRequestListener.java`]((https://github.com/Nereaaaa/cpd-dad/blob/main/disk/src/main/java/es/codeurjc/disk/Listener/DiskRequestListener.java)
 
 ---
 
